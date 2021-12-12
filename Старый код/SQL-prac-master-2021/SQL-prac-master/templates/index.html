@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Prikalel-Bank</title>
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', filename='css/buttons.css') }}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@300&display=swap" rel="stylesheet" type='text/css'>
+    <link href="https://fonts.googleapis.com/css2?family=Monoton&display=swap" rel="stylesheet">
+    <link rel="icon " type="image/png " href="https://bfbsk.ru/wp-content/uploads/2019/03/dollar-icon.png ">
+</head>
+
+<body>
+    <div style="font-family: 'Monoton', cursive; font-size: 30px; text-align: center">
+        Prikalel-Bank&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;users
+    </div>
+    <br>
+    <br>
+    <script type="text/javascript">
+    function Search_by_id() {
+        window.open("./by-id"+"?id="+document.getElementById("id_search").value,"_self");
+    }
+    function Search_by_login() {
+        window.open("./by-login"+"?login="+document.getElementById("login_search").value,"_self");
+    }
+    </script>
+    <div align="center">
+        <input id="id_search" type="text" size="10">
+        <button name="button" onclick="Search_by_id()" class="button button1">Search by id</button>
+    </div>
+    <br>
+    <br>
+    <div align="center">
+        <input id="login_search" type="text" size="10">
+        <button name="button" onclick="Search_by_login()" class="button button1">Search by login</button>
+    </div>
+    <br>
+    <br>
+    <table>
+        <thead>
+            <tr>
+                <th scope="col ">id</th>
+                <th scope="col ">login</th>
+            </tr>
+        </thead>
+        {% for user in users %}
+        <tr>
+            <td>{{ user['id'] }}</td>
+            <td>{{ user['login'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+
+</html>

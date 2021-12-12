@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Prikalel-Bank</title>
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', filename='css/visit_card.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', filename='css/buttons.css') }}" rel="stylesheet" type="text/css">
+    <link rel="icon " type="image/png " href="https://bfbsk.ru/wp-content/uploads/2019/03/dollar-icon.png ">
+</head>
+
+<body>    
+    <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,500" rel="stylesheet">
+
+<div class="card">
+   <div class="card-avatar">
+
+        <img src={{ user_image }} width="100px" height="100px" align="top">
+
+   </div>
+   <div class="card-details">
+      <div class="name">{{ user_info['login'] }}</div>
+      <div class="occupation">Bank user</div>
+      
+      <div class="card-about">
+         <div class="item">
+            <span class="value">{{ user_info['id'] }}</span>
+            <span class="label"> 
+                <div style="margin-top: 0.15rem;
+                font-size: 1rem;
+                font-weight: 600;
+                color: #ff9e1e;">Id</div> 
+            </span>
+         </div>
+         <div class="item">
+            <span class="value">{{ user_info['money_amount'] }} </span>
+            <span class="label">
+                <div style="margin-top: 0.15rem;
+                font-size: 1rem;
+                font-weight: 600;
+                color: #ff9e1e;">Money</div> 
+            </span>
+         </div>
+         <div class="item">
+            <span class="value">{{ user_info['status'] }}</span>
+            <span class="label">
+                <div style="margin-top: 0.15rem;
+                font-size: 1rem;
+                font-weight: 600;
+                color: #ff9e1e;">Status</div> 
+            </span>
+         </div>
+      </div>
+      <div class="skills">
+         <span class="value">{{ user_info['card_number'] }}</span>
+         <br>
+         <span class="value"><div style="margin-top: 0.15rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ff9e1e;">password:</div> {{ user_password }} </span>
+      </div>
+   </div>
+</div>
+<form action="{{ url_for('index') }}" style="margin: 0 auto; width:250px;">
+    <input type="submit" value="Go to main page" class="button button1"/>
+</form>
+</body>
+
+</html>

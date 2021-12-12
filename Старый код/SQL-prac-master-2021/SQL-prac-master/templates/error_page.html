@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Prikalel-Bank</title>
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', filename='css/buttons.css') }}" rel="stylesheet" type="text/css">
+    <link rel="icon " type="image/png " href="https://bfbsk.ru/wp-content/uploads/2019/03/dollar-icon.png ">
+</head>
+
+<body>    
+    <div style="font-family: cursive; font-size: 40px; text-align: center">
+        {{ error_message }}
+    </div>
+    <div style="text-align: center"><img src="{{url_for('static', filename='img/404error.png') }}" alt="404"></div>
+    <form action="{{ url_for('index') }}" style="margin: 0 auto; width:250px;">
+        <input type="submit" value="Go to main page" class="button button1"/>
+    </form>
+</body>
+
+</html>
