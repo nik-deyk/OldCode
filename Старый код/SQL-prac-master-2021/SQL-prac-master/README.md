@@ -1,3 +1,7 @@
+# Описание
+
+Здесь хранится простой сайт-банк с выборкой людей и каким-никаким фронтендом.
+
 # Установить:
 pip3, python3, my_env, flask, sqlite3.
 build-essential, libssl-dev, libffi-dev, python-dev.
