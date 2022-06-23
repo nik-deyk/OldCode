@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DevelopersLifeGifs</string>
+    <string name="my_screen_constant">Этот экран блаблабла</string>
+    <string name="clear_btn_show_text">All gifs cleared</string>
+</resources>
