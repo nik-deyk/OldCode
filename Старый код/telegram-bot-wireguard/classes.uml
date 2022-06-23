@@ -1,0 +1,131 @@
+/' see http://www.plantuml.com/ for syntax '/
+@startuml
+/' !theme plain '/
+skinparam classAttributeIconSize 0
+
+package tokens_module <<Rectangle>> {
+
+interface ITokenStorage {
+  #{field} TOKEN_LEN: int
+  +{method} ITokenStorage(token_len: int)
+  +{method} get(token: str) -> Token
+  +{method} update(token: Token) -> bool
+  +{method} create() -> Token
+}
+
+class Token {
+  -{field} storage: ITokenStorage
+  -{field} token: str
+  -{field} state: TokenState
+  +{method} Token(token: str, state: TokenState, storage: ITokenStorage)
+  +{method} token() -> str
+  +{method} state() -> TokenState
+  +{method} set_state(new: TokenState) -> bool
+}
+
+enum TokenState {
+  {field} FREE
+  {field} ACTIVATED
+}
+
+class TokenDatabase {
+  +{method} TokenDatabase(token_len: int, name: str)
+  +{method} sanitize_token(char_sequence: str) -> bool
+}
+
+Token::state *-- TokenState
+ITokenStorage "0..*" -- "1" Token 
+class TokenDatabase implements ITokenStorage
+
+note right of ITokenStorage::update
+  Returns ""True"", if token was found.
+end note
+
+note right of ITokenStorage::get
+  Returns ""None"", if token was not found.
+end note
+
+note right of Token::"Token(token: str, state: TokenState, storage: ITokenStorage)"
+  Can be called <b>only</b> from ""ITokenStorage"".
+end note
+
+note right of Token::set_state
+  Raises exception if updating failed.
+end note
+
+}
+
+package users_module <<Rectangle>> {
+
+interface IUserStorage {
+  +{field} ts: ITokenStorage
+  +{method} IUserStorage(ts: ITokenStorage)
+  +{method} get(chat_id: str) -> User
+  +{method} update(user: User) -> bool
+  +{method} add(chat_id: str) -> User
+  +{method} used_ips() -> set[IPv4Address]
+}
+
+class User {
+  -{field} storage: IUserStorage
+  -{field} MAX_REQUESTS: int
+  -{field} chat_id: str
+  -{field} state: UserState
+  -{field} token: Token
+  -{field} address: IPv4Address
+  -{field} config_create_time: int
+  -{field} token_requests: int
+  -{field} banned: bool
+  +{method} token_valid() -> bool
+  +{method} config_file() -> str
+  +{method} state() -> UserState
+  +{method} set_state(new: UserState)
+  +{method} try_token(chars: str) -> bool
+  +{method} is_banned() -> bool
+}
+
+enum UserState {
+  {field} NO_TOKEN
+  {field} GONNA_READ_TOKEN
+  {field} HAVE_TOKEN
+}
+
+
+class UserDatabase {
+  +{method} UserDatabase(ts: ITokenStorage, name: str)
+  +{method} obtain(chat_id: str) -> User
+}
+
+class WireGuardConfig {
+  -{field} client_name: str
+  -{field} selected_ip: IPv4Address
+  +{field} MASK_BITS: int
+  +{method} WireGuardConfig(client_name: str, used_ips: set[IPv4Address])
+  +{method} exists() -> bool
+  +{method} create() -> tuple[bool, str]
+  +{method} get() -> str
+  +{method} address() -> IPv4Address
+}
+
+class UserDatabase implements IUserStorage
+User::state *-- UserState
+IUserStorage::ts *-- ITokenStorage
+IUserStorage "0..*" -- "1" User 
+User::token "0..1" -- "0..1" Token
+User::config_file --> WireGuardConfig
+
+note right of User::config_create_time
+  Unix Timestamp.
+end note
+
+note right of User::banned
+  Will be set if ""token_requests > MAX_REQUESTS"".
+end note
+
+note right of UserDatabase::obtain
+  Try to get and add new one if there is no.
+end note
+
+}
+
+@enduml
