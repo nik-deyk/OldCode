@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.UnaryOperator;
 
 public final class AlgorithmsFinal1 {
-    static final int THREADS_COUNT = 10;
+    static final int THREADS_COUNT = 20;
     static final Logger LOGGER = Logger.getLogger(AlgorithmsFinal1.class.getName());
 
     final static class Suffix implements Comparable<Suffix>, Cloneable {
@@ -180,6 +180,11 @@ public final class AlgorithmsFinal1 {
             }
             return result;
         }
+
+        public void cleanUp() {
+            this.maxBits.clear();
+            this.suffixes.clear();
+        }
     }
 
     final static class SearchResult {
@@ -225,6 +230,8 @@ public final class AlgorithmsFinal1 {
                             .add(SuffixSearcher.executor.submit(new SuffixSearcher(
                                     new ExpandableSuffixArray(resolver, i), depth - 1, symbols + 1)));
                 }
+                resolver.cleanUp();
+                System.gc();
             }
         }
     }
