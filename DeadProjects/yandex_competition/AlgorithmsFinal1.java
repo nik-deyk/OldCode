@@ -2,26 +2,24 @@
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.TreeSet;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
-import java.util.stream.Collectors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.UnaryOperator;
 
 public final class AlgorithmsFinal1 {
     static final int THREADS_COUNT = 10;
     static final Logger LOGGER = Logger.getLogger(AlgorithmsFinal1.class.getName());
 
-    final static class Suffix implements Comparable<Suffix> {
+    final static class Suffix implements Comparable<Suffix>, Cloneable {
         private BigInteger hash;
         private final int position;
 
@@ -41,230 +39,153 @@ public final class AlgorithmsFinal1 {
         }
 
         public int get() {
-            return this.position;
+            return position;
         }
 
-        public Suffix expand(TailId tail, BigInteger base) {
-            assert tail != null && tail.length() > 0;
-            var shift = base.pow(tail.length());
-            var expandArea = tail.toBigInteger(base).multiply(base.pow(this.get()));
-            this.hash = this.hash.multiply(shift).add(expandArea);
-            return this;
+        public void rehash(UnaryOperator<BigInteger> op) {
+            hash = op.apply(hash);
         }
 
-        final public static class Expander {
-            private TailId tail;
-            private BigInteger base;
-
-            Expander(TailId tail, BigInteger base) {
-                this.tail = tail;
-                this.base = base;
+        @Override
+        protected Object clone() throws CloneNotSupportedException {
+            Suffix clone = null;
+            try
+            {
+                clone = (Suffix) super.clone();
+                clone.hash = this.hash;
+            } 
+            catch (CloneNotSupportedException e) 
+            {
+                throw new RuntimeException(e);
             }
-
-            public Suffix expand(Suffix s) {
-                return s.expand(tail, base);
-            }
+            return clone;
         }
-    }
-
-    final static class TailId implements Iterable<Integer> {
-        private final int[] tailId;
-        private final BigInteger[] maxBits;
-
-        private TailId(int[] tailId) {
-            assert tailId != null : "Passed tail id must be non-null!";
-            this.tailId = tailId;
-            this.maxBits = new BigInteger[tailId.length];
-        }
-
-        final public class IdIterator implements Iterator<Integer> {
-            private int currentPosition;
-
-            public IdIterator() {
-                this.prepare();
-            }
-
-            public void prepare() {
-                this.currentPosition = 0;
-            }
-
-            public boolean hasNext() {
-                return this.currentPosition < tailId.length;
-            }
-
-            public Integer next() {
-                assert hasNext() : "Current position is out of bounds!";
-                return tailId[this.currentPosition++];
-            }
-        }
-
-        public int length() {
-            return this.tailId.length;
-        }
-
-        public static TailId emptyTail() {
-            return new TailId(new int[0]);
-        }
-
-        public TailId prolong(int next) {
-            int[] newTail = new int[this.tailId.length + 1];
-            System.arraycopy(this.tailId, 0, newTail, 0, this.tailId.length);
-            newTail[newTail.length - 1] = next;
-            return new TailId(newTail);
-        }
-
+     
         @Override
         public String toString() {
-            return "Tail[id=" + Arrays.toString(this.tailId) + "]";
-        }
-
-        @Override
-        public Iterator<Integer> iterator() {
-            return new IdIterator();
-        }
-
-        public TailId[] newVariants(int maxValue) {
-            TailId[] variants = new TailId[maxValue];
-            for (int i = 1; i <= maxValue; i++) { 
-                variants[i - 1] = this.prolong(i);
-            }
-            return variants;
-        }
-
-        public BigInteger toBigInteger(BigInteger base) {
-            assert this.length() > 0 : "Only non-empty tail can be converted to BigInteger";
-            var result = BigInteger.valueOf(this.tailId[this.length() - 1]);
-            for (int i = this.length() - 2; i >= 0; i--) {
-                result = result.multiply(base).add(BigInteger.valueOf(this.tailId[i]));
-            }
-            return result;
-        }
-
-        private void fillMaxBits(BigInteger maxBit) {
-            for (int i = 0; i < this.length(); i++) {
-                this.maxBits[i] = maxBit.multiply(BigInteger.valueOf(this.tailId[i]));
-            }
-        }
-
-        public Suffix[] suffixes(BigInteger base, BigInteger maxBit, int origLength) {
-            this.fillMaxBits(maxBit);
-            var result = new Suffix[this.length()];
-            int i = this.length() - 1;
-            var hash = maxBits[i];
-            result[i] = new Suffix(hash, i);
-            i--;
-            while (i >= 0) {
-                hash = hash.divide(base).add(maxBits[i]);
-                result[i] = new Suffix(hash, i + origLength);
-                i--;
-            }
-            return result;
-        }
-
-        public BigInteger[] maxBits() {
-            return this.maxBits;
+            return "Suffix[pos=" + position + ", hash=" + hash.toString() + "]";
         }
     }
 
     final static class ExpandableSuffixArray {
         private final int LENGTH;
-        private final int UPPER_VALUE;
         private final BigInteger BASE;
         private final BigInteger MAX_BIT;
-        private final List<Integer> elements;
-        private final BigInteger[] maxBits;
+        private final ArrayList<BigInteger> maxBits;
         private final NavigableSet<Suffix> suffixes;
 
-        public ExpandableSuffixArray(List<Integer> array, int maxValue) {
-            this.LENGTH = array.size();
-            this.UPPER_VALUE = maxValue + 2;
-            this.BASE = BigInteger.valueOf(UPPER_VALUE);
-            this.MAX_BIT = BASE.pow(LENGTH - 1);
-            this.elements = array;
-            this.maxBits = new BigInteger[LENGTH];
-            this.suffixes = new TreeSet<Suffix>();
-            this.fillMaxBits();
-            this.calculateSuffixArray();
+        private ExpandableSuffixArray(int length, BigInteger base, BigInteger max, ArrayList<BigInteger> bits,
+                NavigableSet<Suffix> suffixes) {
+            this.LENGTH = length;
+            this.BASE = base;
+            this.MAX_BIT = max;
+            this.maxBits = bits;
+            this.suffixes = suffixes;
         }
 
-        private void fillMaxBits() {
-            for (int i = 0; i < LENGTH; i++) {
-                maxBits[i] = MAX_BIT.multiply(BigInteger.valueOf(this.elements.get(i)));
+        static private NavigableSet<Suffix> deepCopyTreeSet(NavigableSet<Suffix> suffixes) {
+            var result = new TreeSet<Suffix>();
+            for (var suffix: suffixes) {
+                Suffix suffixCopy = null;
+                try {
+                    suffixCopy = (Suffix) suffix.clone();
+                } catch (CloneNotSupportedException e) {
+                    LOGGER.throwing(ExpandableSuffixArray.class.getName(), "deepCopyTreeSet", e);
+                }
+                result.add(suffixCopy);
+            }
+            return result;
+        }
+
+        public ExpandableSuffixArray(List<Integer> array, int maxValue) {
+            this(array.size(), BigInteger.valueOf(maxValue + 2), BigInteger.valueOf(maxValue + 2).pow(array.size() - 1),
+                    new ArrayList<BigInteger>(array.size()), new TreeSet<Suffix>());
+            fillMaxBits(array);
+            fillSuffixArray();
+        }
+
+        public ExpandableSuffixArray(ExpandableSuffixArray other, int newValue) {
+            this(other.LENGTH + 1, other.BASE, other.MAX_BIT.multiply(other.BASE),
+                    new ArrayList<>(other.maxBits), deepCopyTreeSet(other.suffixes));
+            expandMaxBits(newValue);
+            expandSuffixArray(newValue);
+        }
+
+        private void expandMaxBits(int newValue) {
+            for (int i = 0; i < maxBits.size(); i++) {
+                maxBits.set(i, maxBits.get(i).multiply(BASE));
+            }
+            maxBits.add(BigInteger.valueOf(newValue).multiply(MAX_BIT));
+        }
+
+        private void expandSuffixArray(int newValue) {
+            var newValueBigInteger = BigInteger.valueOf(newValue);
+            for (var suffix : suffixes) {
+                suffix.rehash(
+                        oldHash -> oldHash.multiply(BASE).add(newValueBigInteger.multiply(BASE.pow(suffix.get()))));
+            }
+            suffixes.add(new Suffix(newValueBigInteger.multiply(MAX_BIT), LENGTH - 1));
+            LOGGER.finest(String.format("Add new hash while expanding: %d.", newValueBigInteger.multiply(MAX_BIT)));
+        }
+
+        private void fillMaxBits(List<Integer> array) {
+            for (Integer value : array) {
+                maxBits.add(MAX_BIT.multiply(BigInteger.valueOf(value.intValue())));
             }
         }
 
-        private void calculateSuffixArray() {
+        private void fillSuffixArray() {
             int i = LENGTH - 1;
-            var hash = maxBits[i];
-            this.suffixes.add(new Suffix(hash, i));
+            var hash = maxBits.get(i);
+            suffixes.add(new Suffix(hash, i));
+            LOGGER.finest(String.format("Add new hash: %d.", hash));
             i--;
             while (i >= 0) {
-                hash = hash.divide(BASE).add(maxBits[i]);
-                this.suffixes.add(new Suffix(hash, i));
+                hash = hash.divide(BASE).add(maxBits.get(i));
+                suffixes.add(new Suffix(hash, i));
+                LOGGER.finest(String.format("Add new hash: %d.", hash));
                 i--;
             }
         }
 
-        static private int minUniqueSuffixLength(NavigableSet<Suffix> suffixes, 
-                                                 BigInteger[] maxBits, 
-                                                 BigInteger maxBit, 
-                                                 BigInteger base) {
-            var length = suffixes.size();
-            int i = length - 1;
-            var rangeStart = maxBits[i];
-            var rangeEnd = rangeStart.add(maxBit);
+        private int minUniqueSuffixLength() {
+            int i = LENGTH - 1;
+            var rangeStart = maxBits.get(i);
+            var rangeEnd = rangeStart.add(MAX_BIT);
             LOGGER.finest("Start searching suffix length.");
+
             while (i > 0) {
-                LOGGER.finest(String.format("Next search iteration: %d / %d.", length - i, length));
+                LOGGER.finest(String.format("Next search iteration: %d / %d.", LENGTH - i, LENGTH));
                 if (suffixes
                         .subSet(new Suffix(rangeStart), false,
                                 new Suffix(rangeEnd), false)
                         .size() == 0) {
-                    LOGGER.finest(String.format("End searching suffix length, result: %d.", length - i));
-                    return length - i;
+                    LOGGER.finest(String.format("End searching suffix length, result: %d.", LENGTH - i));
+                    return LENGTH - i;
                 }
                 i--;
-                var nextBit = maxBits[i];
-                rangeStart = rangeStart.divide(base).add(nextBit);
-                rangeEnd = rangeEnd.divide(base).add(nextBit);
+                var nextBit = maxBits.get(i);
+                rangeStart = rangeStart.divide(BASE).add(nextBit);
+                rangeEnd = rangeEnd.divide(BASE).add(nextBit);
             }
-            return length;
-        }
-
-        public int minUniqueSuffixLength() {
-            return ExpandableSuffixArray.minUniqueSuffixLength(this.suffixes, this.maxBits, this.MAX_BIT, this.BASE);
-        }
-
-        public int minUniqueSuffixLength(TailId tail) {
-            var e = new Suffix.Expander(tail, BASE);
-            var multiplier = BASE.pow(tail.length());
-            var newMaxBit = MAX_BIT.multiply(multiplier);
-            return ExpandableSuffixArray.minUniqueSuffixLength(
-                Stream.<Suffix>concat(
-                    this.suffixes.stream().<Suffix>map(e::expand),
-                    Arrays.stream(tail.suffixes(BASE, newMaxBit, this.LENGTH))
-                ).collect(Collectors.toCollection(() -> new TreeSet<Suffix>())),
-                Stream.<BigInteger>concat(
-                    Arrays.stream(this.maxBits).<BigInteger>map(multiplier::multiply),
-                    Arrays.stream(tail.maxBits())
-                ).toArray(BigInteger[]::new),
-                newMaxBit,
-                BASE);
+            LOGGER.finest(String.format("No suitable suffix found. Return sequence length: %d.", LENGTH));
+            return LENGTH;
         }
 
         public int[] dumpSuffixArray() {
             var result = new int[LENGTH];
             int i = 0;
-            for (Suffix s : this.suffixes) {
+            for (Suffix s : suffixes) {
                 result[i++] = s.get();
             }
             return result;
         }
     }
-    
+
     final static class SearchResult {
         public int length;
         public int symbols;
+
         public SearchResult(int length, int symbols) {
             this.length = length;
             this.symbols = symbols;
@@ -275,72 +196,76 @@ public final class AlgorithmsFinal1 {
         static public ExecutorService executor = null;
         static public Queue<Future<SearchResult>> tasks = null;
 
-        private ExpandableSuffixArray resolver;
-        private TailId id;
-        private int depth;
-        private int k;
+        static public int maxValue;
 
-        public SuffixSearcher(ExpandableSuffixArray resolver, TailId id, int depth, int maxValue) {
+        private ExpandableSuffixArray resolver;
+        private int depth;
+        private int symbols;
+
+        public SuffixSearcher(ExpandableSuffixArray resolver, int depth, int symbols) {
             this.resolver = resolver;
-            this.id = id;
             this.depth = depth;
-            this.k = maxValue;
+            this.symbols = symbols;
         }
 
         @Override
         public SearchResult call() {
-            int L = resolver.minUniqueSuffixLength(id);
-            int new_depth = Integer.min(depth - 1, L - 1);
-            SuffixSearcher.addTasks(id, resolver, new_depth, k);
-            LOGGER.finest(String.format("New result: %d length, %s tail.", L, id));
-            return new SearchResult(L, id.length());
+            LOGGER.finest(String.format("Searching, symbols num: %d, depth: %d", symbols, depth));
+            int L = resolver.minUniqueSuffixLength();
+            int newDepth = Integer.min(depth, L);
+            SuffixSearcher.addTasks(resolver, newDepth, symbols);
+            LOGGER.finest(String.format("New result: %d length, %d symbols.", L, symbols));
+            return new SearchResult(L, symbols);
         }
 
-        static public void addTasks(TailId origin, ExpandableSuffixArray resolver, int depth, int maxValue) {
-            if (depth > 0) {
-                for (TailId t : origin.newVariants(maxValue)) {
-                    SuffixSearcher.tasks.add(SuffixSearcher.executor.submit(new SuffixSearcher(resolver, t, depth, maxValue)));
+        static public void addTasks(ExpandableSuffixArray resolver, int depth, int symbols) {
+            if (depth > 1) {
+                for (int i = 1; i <= maxValue; i++) {
+                    SuffixSearcher.tasks
+                            .add(SuffixSearcher.executor.submit(new SuffixSearcher(
+                                    new ExpandableSuffixArray(resolver, i), depth - 1, symbols + 1)));
                 }
             }
         }
     }
 
-    public static ExpandableSuffixArray readArray(Scanner myInput, int n, int k) {
-        assert 1 <= n && n <= 1000000 && 1 <= k && k <= 1000000;
-        var inputArray = new ArrayList<Integer>(n);
-        for (int i = 0; i < n; i++) {
-            var t = myInput.nextInt();
-            assert 1 <= t && t <= k : "Invalid number in array!";
+    public static ExpandableSuffixArray readArray(Scanner scan, int N) {
+        assert 1 <= N && N <= 1000000 && 1 <= SuffixSearcher.maxValue && SuffixSearcher.maxValue <= 1000000;
+        var inputArray = new ArrayList<Integer>(N);
+        for (int i = 0; i < N; i++) {
+            var t = scan.nextInt();
+            assert 1 <= t && t <= SuffixSearcher.maxValue : "Invalid number in array!";
             inputArray.add(t);
         }
-        myInput.close();
-        
-        return new ExpandableSuffixArray(inputArray, k);
+
+        return new ExpandableSuffixArray(inputArray, SuffixSearcher.maxValue);
     }
 
     public static void main(String[] args) {
-        Scanner myInput = new Scanner(System.in);
-        int n = myInput.nextInt();
-        int k = myInput.nextInt();
-        var resolver = readArray(myInput, n, k);
-        
+        Scanner scan = new Scanner(System.in);
+        int N = scan.nextInt();
+        SuffixSearcher.maxValue = scan.nextInt();
+        var resolver = readArray(scan, N);
+        scan.close();
+
         int L = resolver.minUniqueSuffixLength();
         int[] results = new int[L + 1]; // 0th element is not used.
         Arrays.fill(results, -1);
         results[L] = 0;
 
-        SuffixSearcher.executor = Executors.newFixedThreadPool(THREADS_COUNT);
+        LOGGER.finest(String.format("Starting threads..."));
         SuffixSearcher.tasks = new ConcurrentLinkedQueue<Future<SearchResult>>();
         try {
-            SuffixSearcher.addTasks(TailId.emptyTail(), resolver, L - 1, k);
+            SuffixSearcher.executor = Executors.newFixedThreadPool(THREADS_COUNT);
+            SuffixSearcher.addTasks(resolver, L, 0);
             while (SuffixSearcher.tasks.size() > 0) {
                 SearchResult r = SuffixSearcher.tasks.poll().get();
                 if (r.length < L) {
-                    int old_length = results[r.length];
-                    if (old_length < 0) {
+                    int oldLength = results[r.length];
+                    if (oldLength < 0) {
                         results[r.length] = r.symbols;
                     } else {
-                        results[r.length] = Integer.min(old_length, r.symbols);
+                        results[r.length] = Integer.min(oldLength, r.symbols);
                     }
                 }
             }
@@ -349,7 +274,6 @@ public final class AlgorithmsFinal1 {
             System.out.println(e.getMessage());
             System.exit(1);
         }
-
 
         for (int i = 1; i <= L; i++) {
             if (results[i] >= 0) {
