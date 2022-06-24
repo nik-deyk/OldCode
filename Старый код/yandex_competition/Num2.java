@@ -1,8 +1,5 @@
 
 import java.util.*;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 class Email implements Comparable<Email> {
     private String login;
@@ -33,7 +30,7 @@ class Email implements Comparable<Email> {
     }
 }
 
-public class J1 {
+public class Num2 {
     static Set<Email> set = new TreeSet<>();
 
     static public void main(String[] args) {

@@ -5,21 +5,21 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.TreeSet;
 import java.util.logging.Logger;
-import java.util.logging.Level;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-public final class TaskSolveClass1 {
+public final class AlgorithmsFinal1 {
     static final int THREADS_COUNT = 10;
-    static final Logger LOGGER = Logger.getLogger(TaskSolveClass1.class.getName());
+    static final Logger LOGGER = Logger.getLogger(AlgorithmsFinal1.class.getName());
 
     final static class Suffix implements Comparable<Suffix> {
         private BigInteger hash;
@@ -102,8 +102,8 @@ public final class TaskSolveClass1 {
             return this.tailId.length;
         }
 
-        public static TailId singleTail(int number) {
-            return new TailId(new int[]{number});
+        public static TailId emptyTail() {
+            return new TailId(new int[0]);
         }
 
         public TailId prolong(int next) {
@@ -121,6 +121,14 @@ public final class TaskSolveClass1 {
         @Override
         public Iterator<Integer> iterator() {
             return new IdIterator();
+        }
+
+        public TailId[] newVariants(int maxValue) {
+            TailId[] variants = new TailId[maxValue];
+            for (int i = 1; i <= maxValue; i++) { 
+                variants[i - 1] = this.prolong(i);
+            }
+            return variants;
         }
 
         public BigInteger toBigInteger(BigInteger base) {
@@ -257,27 +265,47 @@ public final class TaskSolveClass1 {
     final static class SearchResult {
         public int length;
         public int symbols;
-        SuffixResult(int length, int symbols) {
+        public SearchResult(int length, int symbols) {
             this.length = length;
             this.symbols = symbols;
         }
     }
 
     static class SuffixSearcher implements Callable<SearchResult> {
+        static public ExecutorService executor = null;
+        static public Queue<Future<SearchResult>> tasks = null;
+
         private ExpandableSuffixArray resolver;
         private TailId id;
         private int depth;
+        private int k;
+
+        public SuffixSearcher(ExpandableSuffixArray resolver, TailId id, int depth, int maxValue) {
+            this.resolver = resolver;
+            this.id = id;
+            this.depth = depth;
+            this.k = maxValue;
+        }
 
         @Override
         public SearchResult call() {
-            return 12;
+            int L = resolver.minUniqueSuffixLength(id);
+            int new_depth = Integer.min(depth - 1, L - 1);
+            SuffixSearcher.addTasks(id, resolver, new_depth, k);
+            LOGGER.finest(String.format("New result: %d length, %s tail.", L, id));
+            return new SearchResult(L, id.length());
+        }
+
+        static public void addTasks(TailId origin, ExpandableSuffixArray resolver, int depth, int maxValue) {
+            if (depth > 0) {
+                for (TailId t : origin.newVariants(maxValue)) {
+                    SuffixSearcher.tasks.add(SuffixSearcher.executor.submit(new SuffixSearcher(resolver, t, depth, maxValue)));
+                }
+            }
         }
     }
 
-    public static ExpandableSuffixArray read() {
-        Scanner myInput = new Scanner(System.in);
-        int n = myInput.nextInt();
-        int k = myInput.nextInt();
+    public static ExpandableSuffixArray readArray(Scanner myInput, int n, int k) {
         assert 1 <= n && n <= 1000000 && 1 <= k && k <= 1000000;
         var inputArray = new ArrayList<Integer>(n);
         for (int i = 0; i < n; i++) {
@@ -291,16 +319,43 @@ public final class TaskSolveClass1 {
     }
 
     public static void main(String[] args) {
-        var resolver = read();
-        ExecutorService executor = Executors.newFixedThreadPool(THREADS_COUNT);
-        var tasks = new ArrayList<Callable<Integer>>();
+        Scanner myInput = new Scanner(System.in);
+        int n = myInput.nextInt();
+        int k = myInput.nextInt();
+        var resolver = readArray(myInput, n, k);
+        
+        int L = resolver.minUniqueSuffixLength();
+        int[] results = new int[L + 1]; // 0th element is not used.
+        Arrays.fill(results, -1);
+        results[L] = 0;
+
+        SuffixSearcher.executor = Executors.newFixedThreadPool(THREADS_COUNT);
+        SuffixSearcher.tasks = new ConcurrentLinkedQueue<Future<SearchResult>>();
         try {
-            List<Future<Integer>> results = executor.<Integer>invokeAll(tasks);
-            executor.shutdown();
-            for (var result : results) System.out.println(result.get());
+            SuffixSearcher.addTasks(TailId.emptyTail(), resolver, L - 1, k);
+            while (SuffixSearcher.tasks.size() > 0) {
+                SearchResult r = SuffixSearcher.tasks.poll().get();
+                if (r.length < L) {
+                    int old_length = results[r.length];
+                    if (old_length < 0) {
+                        results[r.length] = r.symbols;
+                    } else {
+                        results[r.length] = Integer.min(old_length, r.symbols);
+                    }
+                }
+            }
+            SuffixSearcher.executor.shutdown();
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            System.exit(0);
+            System.exit(1);
+        }
+
+
+        for (int i = 1; i <= L; i++) {
+            if (results[i] >= 0) {
+                System.out.println(i + " " + results[i]);
+                break;
+            }
         }
     }
 }

@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-public class Any {
+public class Num5 {
 
     public static void main(String[] args) {
         Scanner kb = new Scanner(System.in);
