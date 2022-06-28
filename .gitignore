@@ -1,1 +1,11 @@
-Старый код/DevelopersLifeGifs/.gradle
+# Project files in Android Projects:
+
+DeadProjects/DevelopersLifeGifs/.gradle
+
+# Java generated classes:
+
+DeadProjects/**/*.class
+
+# Python cache:
+
+*.pyc
