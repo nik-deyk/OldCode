@@ -1,8 +1,80 @@
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
 
-public class E {
+public class F {
+    private static final int MAX_VALUE = 1000;
+
+    private static enum Side {
+        RIGHT, DOWN
+    }
+
+    private static abstract class RectangleSize implements Comparable<RectangleSize> {
+        protected int a, b;
+        
+        public int getHor() { return a; }
+        
+        public int getVert() { return b; }
+        
+        public int getScale() {return a * b; }
+
+        @Override
+        public int compareTo(RectangleSize other) {
+            return this.getScale() - other.getScale();
+        }
+    }
+
+    private static final class Laptop extends RectangleSize{
+        /**
+         * Create new instance of Laptop.
+         * @param a Horizontal value.
+         * @param b Vertical value.
+         */
+        public Laptop(int a, int b) {
+            this.a = a;
+            this.b = b;
+        }
+        public Laptop rotate() { return new Laptop(this.b, this.a); }
+    }
+
+    private static final class Table extends RectangleSize {
+        public Table(Laptop laptop1, Laptop laptop2, Side side) {
+            if (side == Side.RIGHT) {
+                a = laptop1.getHor() + laptop2.getHor();
+                b = Integer.max(laptop1.getVert(), laptop2.getVert());
+            } else if (side == Side.DOWN) {
+                a = Integer.max(laptop1.getHor(), laptop2.getHor());
+                b = laptop1.getVert() + laptop2.getVert();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int a1, b1, a2, b2;
+        try (var input = new Scanner(System.in)) {
+            a1 = input.nextInt();
+            b1 = input.nextInt();
+            a2 = input.nextInt();
+            b2 = input.nextInt();
+            for (int i : new int[] { a1, b1, a2, b2 }) {
+                assert 0 < i && i <= MAX_VALUE : "Invalid input value: " + i;
+            }
+        }
+        ArrayList<RectangleSize> variants = new ArrayList<>(4);
+        Laptop l1 = new Laptop(a1, b1);
+        Laptop l2 = new Laptop(a2, b2);
+        variants.add(new Table(l1, l2, Side.RIGHT));
+        variants.add(new Table(l1, l2, Side.DOWN));
+        variants.add(new Table(l1, l2.rotate(), Side.RIGHT));
+        variants.add(new Table(l1, l2.rotate(), Side.DOWN));
+        RectangleSize max = Collections.min(variants);
+        System.out.println(max.getHor() + " " + max.getVert());
+    }
+}
+
+class E {
     private static final int MAX_VALUE = 1000000;
 
     private static final class Position {
@@ -21,7 +93,7 @@ public class E {
         return new Position(n1, p1);
     }
 
-    public static void main(String[] args) {
+    private static void main(String[] args) {
         int k1, M, k2, p2, n2;
         try (var input = new Scanner(System.in)) {
             k1 = input.nextInt();
