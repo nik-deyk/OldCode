@@ -1,10 +1,260 @@
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Scanner;
 
-public class F {
+
+public class J {
+    private static enum SolutionCount {
+        NO,
+        LINE,
+        SINGLE,
+        ANY_Y,
+        ANY_X,
+        ANY
+    }
+
+    private static final class SystemOfLinearEquations2 {
+        private final BigDecimal a, b, c, d, e, f;
+        private BigDecimal[] result;
+        private SolutionCount count;
+        SystemOfLinearEquations2(BigDecimal a, BigDecimal b, BigDecimal c,
+                                 BigDecimal d, BigDecimal e, BigDecimal f) {
+            this.a = a; this.b = b; this.c = c; this.d = d; this.e = e; this.f = f;
+            result = null;
+            count = null;
+        }
+        
+        private static boolean isZero(BigDecimal a) {
+            return a.compareTo(BigDecimal.ZERO) == 0;
+        }
+        
+        public void solve() {
+            if (!isZero(a)) {
+                if (!isZero(d.multiply(a).subtract(c.multiply(b)))) {
+                    count = SolutionCount.SINGLE;
+                    BigDecimal y = f.subtract(c.multiply(e).divide(a)).divide(d.subtract(c.multiply(b).divide(a)));
+                    result = new BigDecimal[]{
+                        e.divide(a).subtract(b.divide(a).multiply(y)),
+                        y
+                    };
+                } else {
+                    if (isZero(f.subtract(c.multiply(e).divide(a)))) {
+                        if (!isZero(b)) {
+                            count = SolutionCount.LINE;
+                            result = new BigDecimal[]{
+                                a.divide(b).negate(),
+                                e.divide(b)
+                            };
+                        } else {
+                            count = SolutionCount.ANY_Y;
+                            result = new BigDecimal[]{
+                                e.divide(a)
+                            };
+                        }
+                    } else {
+                        count = SolutionCount.NO;
+                    }
+                }
+            } else {
+                if (!isZero(b)) {
+                    if (!isZero(c)) {
+                        count = SolutionCount.SINGLE;
+                        BigDecimal y = e.divide(b);
+                        result = new BigDecimal[]{
+                            f.subtract(d.multiply(y)).divide(c),
+                            y
+                        };
+                    } else {
+                        if (isZero(f.subtract(d.multiply(e).divide(b)))) {
+                            count = SolutionCount.ANY_X;
+                            result = new BigDecimal[]{
+                                e.divide(b)
+                            };
+                        } else {
+                            count = SolutionCount.NO;
+                        }
+                    }
+                } else {
+                    if (!isZero(e)) {
+                        count = SolutionCount.NO;
+                    } else {
+                        if (!isZero(d)) {
+                            count = SolutionCount.LINE;
+                            result = new BigDecimal[]{
+                                c.divide(d).negate(),
+                                f.divide(d)
+                            };
+                        } else {
+                            if (!isZero(c)) {
+                                count = SolutionCount.ANY_Y;
+                                result = new BigDecimal[]{
+                                    f.divide(c)
+                                };
+                            } else {
+                                if (isZero(f)) {
+                                    count = SolutionCount.ANY;
+                                } else {
+                                    count = SolutionCount.NO;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (result == null) {
+                result = new BigDecimal[0];
+            }
+            assert count != null;
+        }
+
+        public BigDecimal[] getResult() { return result; }
+        public SolutionCount getSolutionCount() { return count; }
+    }
+
+    public static void main(String[] args) {
+        SystemOfLinearEquations2 system;
+        try (var input = new Scanner(System.in)) {
+            system = new SystemOfLinearEquations2(
+                new BigDecimal(input.next()),
+                new BigDecimal(input.next()),
+                new BigDecimal(input.next()),
+                new BigDecimal(input.next()),
+                new BigDecimal(input.next()),
+                new BigDecimal(input.next())
+            );
+        }
+        system.solve();
+        System.out.print(Integer.toString(system.getSolutionCount().ordinal()));
+        for (int i = 0; i < system.getResult().length; i++) {
+            System.out.print(" " + system.getResult()[i].setScale(5, RoundingMode.HALF_DOWN).toPlainString());
+        }
+        System.out.println();
+    }
+}
+
+class I {
+    private static final class Brick {
+        private final BigInteger a, b, c;
+        Brick(BigInteger a, BigInteger b, BigInteger c) {
+            this.a = a; this.b = b; this.c = c;
+        }
+        public Brick[] getVariants() {
+            Brick[] result = new Brick[]{
+                new Brick(a, b, c),
+                new Brick(a, c, b),
+                new Brick(b, a, c),
+                new Brick(b, c, a),
+                new Brick(c, a, b),
+                new Brick(c, b, a)
+            };
+            return result;
+        }
+        public boolean doesClimbThrough(BigInteger d, BigInteger e) {
+            return (a.compareTo(d) <= 0 && b.compareTo(e) <= 0);
+        }
+    }
+
+    private static void main(String[] args) {
+        BigInteger A, B, C, D, E;
+        try (var input = new Scanner(System.in)) {
+            A = new BigInteger(input.next());
+            B = new BigInteger(input.next());
+            C = new BigInteger(input.next());
+            D = new BigInteger(input.next());
+            E = new BigInteger(input.next());
+        }
+        for (Brick b : new Brick(A, B, C).getVariants()) {
+            if (b.doesClimbThrough(D, E)) {
+                System.out.println("YES");
+                System.exit(0);
+            }
+        }
+        System.out.println("NO");
+    }
+}
+
+class H {
+    private static final int MAX_VALUE = 1000;
+
+    private final static class TrainTimetable {
+        final int missingTime;
+        final int onPlatformTime;
+
+        TrainTimetable(int missingTime, int onPlatformTime) {
+            this.missingTime = missingTime;
+            this.onPlatformTime = onPlatformTime;
+        }
+
+        public int getMaxPossibleTime(int trainsNum) {
+            int res = missingTime + (onPlatformTime + missingTime) * trainsNum;
+            return res;
+        }
+
+        public int getMinPossibleTime(int trainsNum) {
+            int res = (onPlatformTime + missingTime) * trainsNum - missingTime;
+            return res;
+        }
+    }
+
+    private static void main(String[] args) {
+        int a, b, m, n;
+        try (var input = new Scanner(System.in)) {
+            a = input.nextInt();
+            b = input.nextInt();
+            m = input.nextInt();
+            n = input.nextInt();
+            for (int i : new int[] { a, b, m, n}) {
+                assert 0 < i && i <= MAX_VALUE : "Invalid input value: " + i;
+            }
+        }
+        TrainTimetable line1 = new TrainTimetable(a, 1);
+        TrainTimetable line2 = new TrainTimetable(b, 1);
+
+        int minWaitingTime = Integer.max(line1.getMinPossibleTime(m), line2.getMinPossibleTime(n));
+        int maxWaitingTime = Integer.min(line1.getMaxPossibleTime(m), line2.getMaxPossibleTime(n));
+        if (minWaitingTime <= maxWaitingTime) {
+            System.out.println(Integer.toString(minWaitingTime) + " " +
+                               Integer.toString(maxWaitingTime));
+        } else {
+            System.out.println("-1");
+        }
+    }
+}
+
+class G {
+    private static final int MAX_VALUE = 200;
+
+    private static void main(String[] args) {
+        int N, K, M;
+        try (var input = new Scanner(System.in)) {
+            N = input.nextInt();
+            K = input.nextInt();
+            M = input.nextInt();
+            for (int i : new int[] { N, K, M }) {
+                assert 0 < i && i <= MAX_VALUE : "Invalid input value: " + i;
+            }
+        }
+        long details = 0;
+        if (N >= K && K >= M) {
+            final int detail_per_fabric = K / M;
+            final int remainder_per_fabric = K % M;
+            while (N >= K) {
+                int fabricated = N / K;
+                N %= K;
+                details += detail_per_fabric * fabricated;
+                N += remainder_per_fabric * fabricated;
+            }
+        }
+        System.out.println(details);
+    }
+}
+
+class F {
     private static final int MAX_VALUE = 1000;
 
     private static enum Side {
@@ -51,7 +301,7 @@ public class F {
         }
     }
 
-    public static void main(String[] args) {
+    private static void main(String[] args) {
         int a1, b1, a2, b2;
         try (var input = new Scanner(System.in)) {
             a1 = input.nextInt();
