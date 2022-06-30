@@ -19,6 +19,9 @@ public class J {
 
     private static final class SystemOfLinearEquations2 {
         private final BigDecimal a, b, c, d, e, f;
+        public static final RoundingMode RM = RoundingMode.HALF_EVEN;
+        public final static int SC = 5;
+        private final static BigDecimal threshold = new BigDecimal("0.00001");
         private BigDecimal[] result;
         private SolutionCount count;
         SystemOfLinearEquations2(BigDecimal a, BigDecimal b, BigDecimal c,
@@ -29,30 +32,30 @@ public class J {
         }
         
         private static boolean isZero(BigDecimal a) {
-            return a.compareTo(BigDecimal.ZERO) == 0;
+            return a.abs().compareTo(threshold) < 0;
         }
         
         public void solve() {
             if (!isZero(a)) {
                 if (!isZero(d.multiply(a).subtract(c.multiply(b)))) {
                     count = SolutionCount.SINGLE;
-                    BigDecimal y = f.subtract(c.multiply(e).divide(a)).divide(d.subtract(c.multiply(b).divide(a)));
+                    BigDecimal y = f.subtract(c.multiply(e).divide(a, SC, RM)).divide(d.subtract(c.multiply(b).divide(a, SC, RM)), SC, RM);
                     result = new BigDecimal[]{
-                        e.divide(a).subtract(b.divide(a).multiply(y)),
+                        e.divide(a, SC, RM).subtract(b.divide(a, SC, RM).multiply(y)),
                         y
                     };
                 } else {
-                    if (isZero(f.subtract(c.multiply(e).divide(a)))) {
+                    if (isZero(f.subtract(c.multiply(e).divide(a, SC, RM)))) {
                         if (!isZero(b)) {
                             count = SolutionCount.LINE;
                             result = new BigDecimal[]{
-                                a.divide(b).negate(),
-                                e.divide(b)
+                                a.divide(b, SC, RM).negate(),
+                                e.divide(b, SC, RM)
                             };
                         } else {
                             count = SolutionCount.ANY_Y;
                             result = new BigDecimal[]{
-                                e.divide(a)
+                                e.divide(a, SC, RM)
                             };
                         }
                     } else {
@@ -63,16 +66,16 @@ public class J {
                 if (!isZero(b)) {
                     if (!isZero(c)) {
                         count = SolutionCount.SINGLE;
-                        BigDecimal y = e.divide(b);
+                        BigDecimal y = e.divide(b, SC, RM);
                         result = new BigDecimal[]{
-                            f.subtract(d.multiply(y)).divide(c),
+                            f.subtract(d.multiply(y)).divide(c, SC, RM),
                             y
                         };
                     } else {
-                        if (isZero(f.subtract(d.multiply(e).divide(b)))) {
+                        if (isZero(f.subtract(d.multiply(e).divide(b, SC, RM)))) {
                             count = SolutionCount.ANY_X;
                             result = new BigDecimal[]{
-                                e.divide(b)
+                                e.divide(b, SC, RM)
                             };
                         } else {
                             count = SolutionCount.NO;
@@ -85,14 +88,14 @@ public class J {
                         if (!isZero(d)) {
                             count = SolutionCount.LINE;
                             result = new BigDecimal[]{
-                                c.divide(d).negate(),
-                                f.divide(d)
+                                c.divide(d, SC, RM).negate(),
+                                f.divide(d, SC, RM)
                             };
                         } else {
                             if (!isZero(c)) {
                                 count = SolutionCount.ANY_Y;
                                 result = new BigDecimal[]{
-                                    f.divide(c)
+                                    f.divide(c, SC, RM)
                                 };
                             } else {
                                 if (isZero(f)) {
@@ -131,7 +134,7 @@ public class J {
         system.solve();
         System.out.print(Integer.toString(system.getSolutionCount().ordinal()));
         for (int i = 0; i < system.getResult().length; i++) {
-            System.out.print(" " + system.getResult()[i].setScale(5, RoundingMode.HALF_DOWN).toPlainString());
+            System.out.print(" " + system.getResult()[i].setScale(SystemOfLinearEquations2.SC, SystemOfLinearEquations2.RM).toPlainString());
         }
         System.out.println();
     }
