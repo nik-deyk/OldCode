@@ -13,4 +13,5 @@ DeadProjects/**/*.class
 # Gradle Project:
 
 DeadProjects/other/java_data_structures/.gradle
+DeadProjects/other/java_data_structures/build
 

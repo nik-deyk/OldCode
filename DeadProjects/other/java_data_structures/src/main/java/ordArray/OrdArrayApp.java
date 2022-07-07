@@ -1,6 +1,9 @@
 package ordArray;
 
 import static java.lang.System.out;
+
+import java.util.InputMismatchException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class OrdArrayApp {
@@ -37,6 +40,8 @@ public class OrdArrayApp {
 						break main;
 				}
 			}
-		}
+		} catch (NoSuchElementException|IllegalStateException e) {
+            out.println("Input is bad. Exiting...");
+        }
 	}
 }
