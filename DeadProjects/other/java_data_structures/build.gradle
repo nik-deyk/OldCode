@@ -1,6 +1,11 @@
 plugins {
     id 'java'
 }
+
+repositories { 
+    mavenCentral() 
+}
+
 jar {
   manifest {
     attributes(
@@ -8,4 +13,19 @@ jar {
       'Main-Class': 'ordArray.OrdArrayApp'
     )
   }
+  archiveVersion =  '0.1.0'
+}
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.8.1")
+    testImplementation("org.junit.platform:junit-platform-suite:1.8.1")
+}
+
+test {
+    useJUnitPlatform()
 }
