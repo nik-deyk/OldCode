@@ -9,3 +9,8 @@ DeadProjects/**/*.class
 # Python cache:
 
 *.pyc
+
+# Gradle Project:
+
+DeadProjects/other/java_data_structures/.gradle
+
