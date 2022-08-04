@@ -2,7 +2,6 @@ package ordArray;
 
 import static java.lang.System.out;
 
-import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -10,8 +9,8 @@ public class OrdArrayApp {
     public static void main(String[] args) {
 		try (Scanner myInput = new Scanner(System.in)) {
 			out.print("Enter max array size: ");
-			int maxSize = myInput.nextInt(); // array size
-			 OrdArray 	arr = new OrdArray(maxSize); // create the array
+			int maxSize = myInput.nextInt();
+			OrdArray 	arr = new OrdArray(maxSize);
 
 		main:
 			while (true) {

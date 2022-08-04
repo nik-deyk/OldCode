@@ -11,21 +11,21 @@ import static java.lang.System.out;
 */
 public class OrdArray {
 	private long[] a;
-	private int nElems;
+	private int elementsCount;
 
-	public OrdArray(int max) // constructor
-	{
-		a = new long[max]; // create array
-		nElems = 0;
+	public OrdArray(int max) {
+		a = new long[max];
+		elementsCount = 0;
 	}
 
 	public int size() {
-		return nElems;
+		return elementsCount;
 	}
 
 	private static class FindResult {
 		public final int index;
 		public final boolean success;
+
 		FindResult(int index, boolean success) {
 			this.index = index;
 			this.success = success;
@@ -34,56 +34,53 @@ public class OrdArray {
 
 	private FindResult binarySearch(long searchKey) {
 		int lowerBound = 0;
-		int upperBound = nElems - 1;
+		int upperBound = elementsCount - 1;
 		int curIn;
 
 		while (lowerBound <= upperBound) {
 			curIn = (lowerBound + upperBound) / 2;
 			if (a[curIn] == searchKey)
-				return new FindResult(curIn, true); // found it
-			else if (a[curIn] < searchKey) // divide range
-				lowerBound = curIn + 1; // it's in upper half
+				return new FindResult(curIn, true);
+			else if (a[curIn] < searchKey)
+				lowerBound = curIn + 1;
 			else
-				upperBound = curIn - 1; // it's in lower half
-		} // end while
+				upperBound = curIn - 1;
+		}
 		return new FindResult(lowerBound, false);
 	}
 
 	public int find(long searchKey) {
 		var res = this.binarySearch(searchKey);
-		return (res.success) ? res.index : this.nElems;
+		return (res.success) ? res.index : this.elementsCount;
 	}
 
-	public boolean insert(long value) // put element into array
-	{
+	public boolean insert(long value) {
 		var searchRes = this.binarySearch(value);
-		if (searchRes.success || this.nElems == this.a.length) {
+		if (searchRes.success || this.elementsCount == this.a.length) {
 			return false;
 		}
-		for (int k = nElems; k > searchRes.index; k--) // move bigger ones up
+		for (int k = elementsCount; k > searchRes.index; k--)
 			a[k] = a[k - 1];
-		a[searchRes.index] = value; // insert it
-		nElems++; // increment size
+		a[searchRes.index] = value;
+		elementsCount++;
 		return true;
 	}
 
 	public boolean delete(long value) {
 		var searchRes = this.binarySearch(value);
-		if (!searchRes.success) // can't find it
+		if (!searchRes.success) {
 			return false;
-		else // found it
-		{
-			for (int k = searchRes.index; k < nElems - 1; k++) // move bigger ones down
+		} else {
+			for (int k = searchRes.index; k < elementsCount - 1; k++)
 				a[k] = a[k + 1];
-			nElems--; // decrement size
+			elementsCount--;
 			return true;
 		}
 	}
 
-	public void display() // displays array contents
-	{
-		for (int j = 0; j < nElems; j++) // for each element,
-			out.print(a[j] + " "); // display it
+	public void display() {
+		for (int j = 0; j < elementsCount; j++)
+			out.print(a[j] + " ");
 		out.println();
 	}
 

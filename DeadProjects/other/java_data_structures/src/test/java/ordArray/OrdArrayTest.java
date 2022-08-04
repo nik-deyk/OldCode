@@ -52,7 +52,7 @@ public class OrdArrayTest {
         arr.insert(-3);
         arr.insert(44);
         arr.insert(30);
-        // Actual -3 0 12 30 44
+        // Actual -3 0 12 30 44.
         assertEquals(arr.find(-3), 0, "The minimum key must be in the beginning");
         assertEquals(arr.find(12), 2, "The middle key must appear in the middle of array");
         assertEquals(arr.find(44), 4, "The maximum key must be in the end of array");
