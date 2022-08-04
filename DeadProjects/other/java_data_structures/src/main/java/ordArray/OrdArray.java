@@ -1,7 +1,5 @@
 package ordArray;
 
-import static java.lang.System.out;
-
 /**
 * @file orderedArray.java
 * Demonstrates ordered array class.
@@ -56,7 +54,7 @@ public class OrdArray {
 
 	public boolean insert(long value) {
 		var searchRes = this.binarySearch(value);
-		if (searchRes.success || this.elementsCount == this.a.length) {
+		if (this.elementsCount == this.a.length || searchRes.success) {
 			return false;
 		}
 		for (int k = elementsCount; k > searchRes.index; k--)
@@ -78,10 +76,36 @@ public class OrdArray {
 		}
 	}
 
-	public void display() {
-		for (int j = 0; j < elementsCount; j++)
-			out.print(a[j] + " ");
-		out.println();
+	public String toString() {
+		StringBuilder representation = new StringBuilder();
+		for (int j = 0; j < elementsCount; j++) {
+			representation.append(a[j] + " ");
+		}
+		return representation.toString();
 	}
 
+	public boolean merge(OrdArray other) {
+		long[] result = new long[this.a.length];
+		int i = 0, j = 0, k = 0;
+		boolean oneElementCanNotBeAdded = false;
+		while ((i < this.elementsCount || j < other.elementsCount) && 
+				!oneElementCanNotBeAdded) {
+			long valueToAdd = 0;
+			if (i < this.elementsCount && (j >= other.elementsCount || this.a[i] < other.a[j])) {
+				valueToAdd = this.a[i++];
+			} else {
+				valueToAdd = other.a[j++];
+			}
+			if (k == 0 || result[k - 1] != valueToAdd) {
+				if (k < result.length) {
+					result[k++] = valueToAdd;
+				} else {
+					oneElementCanNotBeAdded = true;
+				}
+			}
+		}
+		this.a = result;
+		this.elementsCount = k;
+		return oneElementCanNotBeAdded;
+	}
 }
