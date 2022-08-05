@@ -39,6 +39,42 @@ public class OrdArrayTest {
 		assertEquals(arr.size(), 0, "New array must have zero size");
 	}
 
+	@Test
+	void toStringTest() {
+		OrdArray arr = new OrdArray(3);
+		arr.insert(1);
+		arr.insert(2);
+		arr.insert(3);
+		assertEquals(arr.toString(), "1 2 3 ");
+	}
+
+	@Test
+	void deleteNotExistedElementReturnFalse() {
+		OrdArray arr = new OrdArray(3);
+		arr.insert(1);
+		arr.insert(2);
+		arr.insert(3);
+		assertFalse(arr.delete(4));
+	}
+
+	@Test
+	void insertToFullArrayReturnFalse() {
+		OrdArray arr = new OrdArray(3);
+		arr.insert(1);
+		arr.insert(2);
+		arr.insert(3);
+		assertFalse(arr.insert(4));
+	}
+
+	@Test
+	void insertExistingValueToArrayReturnFalse() {
+		OrdArray arr = new OrdArray(5);
+		arr.insert(1);
+		arr.insert(2);
+		arr.insert(3);
+		assertFalse(arr.insert(2));
+	}
+
 	@ParameterizedTest
 	@ValueSource(ints = {1, 3, 5, 15}) 
 	void sizeIsCorrectAfterInsertingSeveralValues(int number) {
