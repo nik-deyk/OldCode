@@ -1,4 +1,3 @@
-
 import java.util.*;
 
 class Email implements Comparable<Email> {
