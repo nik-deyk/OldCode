@@ -1,11 +1,14 @@
 plugins {
     id 'java'
     id 'jacoco'
+    id "org.ysb33r.doxygen" version "0.7.0"
 }
 
 repositories { 
     mavenCentral() 
 }
+
+version = '0.1.0'
 
 jar {
   manifest {
@@ -14,7 +17,7 @@ jar {
       'Main-Class': 'ordArray.OrdArrayApp'
     )
   }
-  archiveVersion =  '0.1.0'
+  archiveVersion = '${version}'
 }
 
 sourceCompatibility = 11
@@ -39,4 +42,12 @@ jacocoTestReport {
             fileTree(dir: it, exclude: 'ordArray/OrdArrayApp*')
         }))
     }
+}
+
+doxygen {
+    template                new File(projectDir, 'Doxyfile')
+    source                  new File(projectDir,'src/main/java')
+    source                  new File(projectDir,'README.md')
+    use_mdfile_as_mainpage  new File(projectDir, 'README.md')
+    outputDir               new File(buildDir, 'build/docs')
 }
