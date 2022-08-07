@@ -1,12 +1,15 @@
-package ordArray;
-
 /**
-* @file orderedArray.java
+* @file OrdArray.java
 * Demonstrates ordered array class.
 * Example from "Data Structures and Algorithms in Java" by Robert Lafore.
 * I made it to use binary search when inserting an element and added
 * some good ways to interact with the data structure in main function.
 */
+package ordArray;
+
+/**
+ * The data structure representing one fixes-size sorted array.
+ */
 public class OrdArray {
 	private long[] a;
 	private int elementsCount;
