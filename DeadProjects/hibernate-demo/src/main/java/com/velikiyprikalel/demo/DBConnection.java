@@ -15,8 +15,8 @@ import java.util.Properties;
 
 import com.velikiyprikalel.demo.pojo.Task;
 
-public class DBConnection {
-    public static List<Task> getAll() {
+public class DBConnection implements DBInterface {
+    public List<Task> getAll() {
         String query = "SELECT * from tasks_table";
 
         List<Task> list = new ArrayList<>();

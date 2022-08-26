@@ -9,6 +9,3 @@ bin/
 
 # VS Code:
 .vscode/
-
-# Configuration (with password):
-src/main/resources/config.properties

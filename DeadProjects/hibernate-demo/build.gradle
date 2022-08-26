@@ -12,6 +12,7 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.hibernate:hibernate-core:6.1.2.Final'
 	implementation  'org.postgresql:postgresql:42.2.19'
 	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.0.3'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.0.3'

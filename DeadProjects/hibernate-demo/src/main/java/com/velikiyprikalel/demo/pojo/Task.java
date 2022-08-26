@@ -1,9 +1,32 @@
 package com.velikiyprikalel.demo.pojo;
 
-public class Task {
+import java.io.Serializable;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "tasks_table")
+public class Task implements Serializable {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+	@Column(name = "task_name")
     private String taskName;
-    private String owner;
+
+	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "owner", referencedColumnName = "name")
+    private Owner owner;
+
     private int priority;
 
     public Task() {
@@ -12,7 +35,7 @@ public class Task {
     public Task(int id, String taskName, String owner, int priority) {
         this.id = id;
         this.taskName = taskName;
-        this.owner = owner;
+        this.owner = new Owner(taskName);
         this.priority = priority;
     }
 
@@ -37,11 +60,11 @@ public class Task {
     }
 
     public String getOwner() {
-        return owner;
+        return owner.getName();
     }
 
     public void setOwner(String owner) {
-        this.owner = owner;
+        this.owner = new Owner(owner);
     }
 
     public int getPriority() {
@@ -56,7 +79,7 @@ public class Task {
         return "Task{" +
                 "id=" + id +
                 ", taskName='" + taskName + '\'' +
-                ", owner='" + owner + '\'' +
+                ", owner='" + owner.getName() + '\'' +
                 ", priority=" + priority +
                 '}';
     }
