@@ -18,69 +18,69 @@ import jakarta.persistence.Table;
 public class Task implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+	private int id;
 
 	@Column(name = "task_name")
-    private String taskName;
+	private String taskName;
 
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "owner", referencedColumnName = "name")
-    private Owner owner;
+	private Owner owner;
 
-    private int priority;
+	private int priority;
 
-    public Task() {
-    }
+	public Task() {
+	}
 
-    public Task(int id, String taskName, String owner, int priority) {
-        this.id = id;
-        this.taskName = taskName;
-        this.owner = new Owner(taskName);
-        this.priority = priority;
-    }
+	public Task(int id, String taskName, String owner, int priority) {
+		this.id = id;
+		this.taskName = taskName;
+		this.owner = new Owner(taskName);
+		this.priority = priority;
+	}
 
-    public Task(String taskName, String owner, int priority) {
-        this(0, taskName, owner, priority);
-    }
+	public Task(String taskName, String owner, int priority) {
+		this(0, taskName, owner, priority);
+	}
 
-    public int getId() {
-        return id;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public void setId(int id) {
-        this.id = id;
-    }
+	public void setId(int id) {
+		this.id = id;
+	}
     
-    public String getTaskName() {
-        return taskName;
-    }
+	public String getTaskName() {
+		return taskName;
+	}
 
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
+	public void setTaskName(String taskName) {
+		this.taskName = taskName;
+	}
 
-    public String getOwner() {
-        return owner.getName();
-    }
+	public String getOwner() {
+		return owner.getName();
+	}
 
-    public void setOwner(String owner) {
-        this.owner = new Owner(owner);
-    }
+	public void setOwner(String owner) {
+		this.owner = new Owner(owner);
+	}
 
-    public int getPriority() {
-        return priority;
-    }
+	public int getPriority() {
+		return priority;
+	}
 
-    public void setPriority(int priority) {
-        this.priority = priority;
-    }
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
 
-    public String toString() {
-        return "Task{" +
-                "id=" + id +
-                ", taskName='" + taskName + '\'' +
-                ", owner='" + owner.getName() + '\'' +
-                ", priority=" + priority +
-                '}';
-    }
+	public String toString() {
+		return "Task{" +
+				"id=" + id +
+				", taskName='" + taskName + '\'' +
+				", owner='" + owner.getName() + '\'' +
+				", priority=" + priority +
+				'}';
+	}
 }

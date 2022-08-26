@@ -16,45 +16,45 @@ import java.util.Properties;
 import com.velikiyprikalel.demo.pojo.Task;
 
 public class DBConnection implements DBInterface {
-    public List<Task> getAll() {
-        String query = "SELECT * from tasks_table";
+	public List<Task> getAll() {
+		String query = "SELECT * from tasks_table";
 
-        List<Task> list = new ArrayList<>();
+		List<Task> list = new ArrayList<>();
 
-        try {
-            Connection connection = getConnection();
-            Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(query);
+		try {
+			Connection connection = getConnection();
+			Statement statement = connection.createStatement();
+			ResultSet rs = statement.executeQuery(query);
 
-            while (rs.next()) {
-                Task task = new Task(rs.getInt("id"), 
-                    rs.getString("task_name"),
-                    rs.getString("owner"),
-                    rs.getInt("priority"));
+			while (rs.next()) {
+				Task task = new Task(rs.getInt("id"), 
+					rs.getString("task_name"),
+					rs.getString("owner"),
+					rs.getInt("priority"));
 
-                list.add(task);
-            }
+				list.add(task);
+			}
 
-            rs.close();
-            statement.close();
-            connection.close();
-        } catch (SQLException|IOException e) {
-            e.printStackTrace();
-        }
+			rs.close();
+			statement.close();
+			connection.close();
+		} catch (SQLException|IOException e) {
+			e.printStackTrace();
+		}
 
-        return list;
-    }
+		return list;
+	}
 
-    private static Connection getConnection() throws FileNotFoundException, IOException, SQLException {
-        Properties properties = new Properties();
-        try (InputStream stream = new FileInputStream("src/main/resources/config.properties")) {
-            properties.load(stream);
-        }
+	private static Connection getConnection() throws FileNotFoundException, IOException, SQLException {
+		Properties properties = new Properties();
+		try (InputStream stream = new FileInputStream("src/main/resources/config.properties")) {
+			properties.load(stream);
+		}
 
-        String url = properties.getProperty("url");
-        String user = properties.getProperty("username");
-        String password = properties.getProperty("password");
+		String url = properties.getProperty("url");
+		String user = properties.getProperty("username");
+		String password = properties.getProperty("password");
 
-        return DriverManager.getConnection(url, user, password);
-    }
+		return DriverManager.getConnection(url, user, password);
+	}
 }
