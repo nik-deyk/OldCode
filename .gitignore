@@ -1,6 +1,6 @@
-# Project files in Android Projects:
+# Gradle generated files:
 
-DeadProjects/DevelopersLifeGifs/.gradle
+DeadProjects/**/.gradle
 
 # Java generated classes:
 
@@ -9,9 +9,3 @@ DeadProjects/**/*.class
 # Python cache:
 
 *.pyc
-
-# Gradle Project:
-
-DeadProjects/other/java_data_structures/.gradle
-DeadProjects/other/java_data_structures/build
-
