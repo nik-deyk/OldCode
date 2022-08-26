@@ -1,0 +1,28 @@
+plugins {
+	id 'java'
+	id 'application'
+}
+
+group = 'com.velikiyprikalel'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation  'org.postgresql:postgresql:42.2.19'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.0.3'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.0.3'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+task removeBin(type: Delete) {
+  delete 'bin'
+}
+
+mainClassName = 'com.velikiyprikalel.demo.DemoApplication'
