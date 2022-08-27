@@ -8,4 +8,4 @@ DeadProjects/**/*.class
 
 # Python cache:
 
-*.pyc
+DeadProjects/**/*.pyc
