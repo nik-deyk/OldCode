@@ -1,4 +1,4 @@
-package com.velikiyprikalel.millfactory;
+package com.velikiyprikalel.millFactory;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

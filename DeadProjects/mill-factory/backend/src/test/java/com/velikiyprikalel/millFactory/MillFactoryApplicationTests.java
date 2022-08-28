@@ -1,4 +1,4 @@
-package com.velikiyprikalel.millfactory;
+package com.velikiyprikalel.millFactory;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
