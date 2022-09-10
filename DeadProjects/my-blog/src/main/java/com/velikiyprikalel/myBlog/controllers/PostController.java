@@ -1,6 +1,5 @@
 package com.velikiyprikalel.myBlog.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,8 +11,6 @@ import com.velikiyprikalel.myBlog.posts.api.PostService;
 @Controller
 public class PostController {
 
-    @Autowired
-    @Qualifier("DatabasePostService")
     private final PostService postService;
     
     public PostController(@Qualifier("DatabasePostService") PostService postService) {

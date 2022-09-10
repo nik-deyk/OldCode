@@ -1,6 +1,9 @@
 package com.velikiyprikalel.myBlog.posts.impl;
 
 import java.util.List;
+import java.util.stream.IntStream;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -28,5 +31,4 @@ public class DatabasePostService implements PostService {
     public List<? extends Post> getWhereTitleContainString(String query) {
         return postRepository.findByTitleContainingIgnoreCase(query);
     }
-    
 }
