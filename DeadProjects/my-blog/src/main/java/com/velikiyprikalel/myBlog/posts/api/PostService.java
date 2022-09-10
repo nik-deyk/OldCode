@@ -5,5 +5,7 @@ import java.util.List;
 import com.velikiyprikalel.myBlog.plains.Post;
 
 public interface PostService {
-    List<Post> getAll();
+    List<? extends Post> getAll();
+
+    List<? extends Post> getWhereTitleContainString(String query);
 }
