@@ -1,4 +1,9 @@
-HELP.md
+### H@ generated log file ###
+
+db/app_db.trace.db
+
+### OTHER ###
+
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
