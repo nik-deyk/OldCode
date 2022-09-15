@@ -1,11 +1,11 @@
 # Gradle generated files:
 
-DeadProjects/**/.gradle
+**/.gradle
 
 # Java generated classes:
 
-DeadProjects/**/*.class
+**/*.class
 
 # Python cache:
 
-DeadProjects/**/*.pyc
+**/*.pyc
