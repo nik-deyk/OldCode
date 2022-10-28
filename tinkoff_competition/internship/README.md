@@ -2,7 +2,7 @@
 
 ### Условие
 
-![Log](https://github.com/Prikalel/OldCode/blob/main/DeadProjects/tinkoff_competition/internship/Etask.png?raw=true)
+![Log](https://github.com/Prikalel/OldCode/blob/main/tinkoff_competition/internship/Etask.png?raw=true)
 
 ### Примеры
 
