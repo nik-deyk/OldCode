@@ -15,7 +15,7 @@ https://contest.yandex.ru/contest/30228/problems/
 
 Моё решение дошло до 5 теста и превысило лимит памяти.
 
-![Log](https://github.com/Prikalel/OldCode/blob/main/DeadProjects/yandex_competition/AlgorithmsFinal1.png?raw=true)
+![Log](https://github.com/Prikalel/OldCode/blob/main/yandex_competition/AlgorithmsFinal1.png?raw=true)
 
 # Mobile offer 07_2022
 
@@ -43,4 +43,4 @@ false
 
 Моё решение прошло все тесты.
 
-![Log](https://github.com/Prikalel/OldCode/blob/main/DeadProjects/yandex_competition/MobileOffer_2022_07.png?raw=true)
+![Log](https://github.com/Prikalel/OldCode/blob/main/yandex_competition/MobileOffer_2022_07.png?raw=true)

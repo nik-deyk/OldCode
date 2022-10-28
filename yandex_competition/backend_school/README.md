@@ -11,5 +11,5 @@
 
 Моё решение прошло **все** тесты.
 
-![Log](https://github.com/Prikalel/OldCode/blob/main/DeadProjects/yandex_competition/backend_school/log.png?raw=true)
+![Log](https://github.com/Prikalel/OldCode/blob/main/yandex_competition/backend_school/log.png?raw=true)
 

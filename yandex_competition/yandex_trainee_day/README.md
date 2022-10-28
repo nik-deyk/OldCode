@@ -13,11 +13,11 @@ https://contest.yandex.ru/contest/39201
 
 Моё решение прошло **все** тесты.
 
-![Log](https://github.com/Prikalel/OldCode/blob/main/DeadProjects/yandex_competition/yandex_trainee_day/A_solved_proof.png?raw=true)
+![Log](https://github.com/Prikalel/OldCode/blob/main/yandex_competition/yandex_trainee_day/A_solved_proof.png?raw=true)
 
 ### Текст задачи:
 
-![Text](https://github.com/Prikalel/OldCode/blob/main/DeadProjects/yandex_competition/yandex_trainee_day/A_task_text.png?raw=true)
+![TaskText](https://github.com/Prikalel/OldCode/blob/main/yandex_competition/yandex_trainee_day/A_task_text.png?raw=true)
 
 ### Проверить у себя:
 
