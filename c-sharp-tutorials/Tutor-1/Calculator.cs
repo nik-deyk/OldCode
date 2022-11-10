@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace Hello
 {
     public class Calculator
@@ -17,7 +12,7 @@ namespace Hello
                 string number_b = input.Substring(plusSignPosition + 1); // "14"
 
                 int a = Convert.ToInt32(number_a);
-                int b = Convert.ToInt32(number_b); // "abc"
+                int b = Convert.ToInt32(number_b);
                 sum = a + b;
             } else {
                 throw new ArgumentException("У вас строка должна содержать +, а там его нет");

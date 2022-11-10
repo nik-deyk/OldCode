@@ -22,11 +22,11 @@ c.get() <<-- получить сумму.
 namespace Hello {
     class Program {
         public static void Main(string[] args) {
-            string text = Console.ReadLine(); // "12+abc";
+            string text = Console.ReadLine();
 
             try {
                 Calculator c = new Calculator(text);
-                Console.WriteLine("Sum is : " + c.get()); // 146
+                Console.WriteLine("Sum is : " + c.get());
             } catch (FormatException e) {
                 Console.WriteLine("Your string is wrong");
             } catch (ArgumentException e) {
@@ -35,7 +35,3 @@ namespace Hello {
         }
     }
 }
-
-/**
-
-*/
