@@ -6,6 +6,7 @@
     <RootNamespace>Tutor_1_homework</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <StartupObject>Nikita.NikitaVersion</StartupObject>
   </PropertyGroup>
 
 </Project>
